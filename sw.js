@@ -25,6 +25,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(cached => {
       return cached || fetch(e.request).then(resp => {
+        // optionally cache new responses
         return resp;
       }).catch(() => cached);
     })

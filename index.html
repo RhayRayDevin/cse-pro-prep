@@ -416,10 +416,595 @@
   </nav>
 
   <script>
-    // Full app logic is embedded. See original for complete QUESTIONS bank, tips, adaptive engine, etc.
-    // This is a complete offline PWA for CSE Professional Level prep.
-    alert('App loaded from GitHub! Full question bank and features are active.');
-    // Note: For the complete version with all 70+ questions and full logic, use the local zip or the full index.html from artifacts.
+    // ========== DATA ==========
+    const TARGET = new Date('2026-11-22T08:00:00+08:00');
+    const PASSING = 80;
+
+    const TIPS = [
+      "Subject-Verb Agreement: Singular subjects take singular verbs (usually with -s). Plural subjects take plural verbs (no -s).",
+      "In inverted sentences with 'here' or 'there', the subject follows the verb: 'Here are the towels.'",
+      "Fractional expressions (half of, part of) take singular or plural verbs depending on the noun that follows.",
+      "For number series: look for arithmetic (+/−), geometric (×/÷), or alternating patterns first.",
+      "In word problems, identify what is asked first, then list the given data before computing.",
+      "Analogy tip: identify the exact relationship (synonym, antonym, part-to-whole, cause-effect, degree).",
+      "Reading comprehension: read the questions first so you know what to look for in the passage.",
+      "Paragraph organization: look for the topic sentence (usually first or last) and logical connectors (however, therefore, meanwhile).",
+      "RA 6713 (Code of Conduct): Public officials must prioritize public interest over personal interest.",
+      "1987 Constitution Art. II Sec. 1: The Philippines is a democratic and republican State. Sovereignty resides in the people.",
+      "Art. II Sec. 16: The State shall protect and advance the right of the people to a balanced and healthful ecology.",
+      "Civilian authority is at all times supreme over the military (Art. II Sec. 3).",
+      "Speed tip: eliminate two obviously wrong options first — your odds jump from 25% to 50%.",
+      "For grammar: watch for collective nouns (team, committee) — they are usually singular in American English used in CSE.",
+      "Data interpretation: always check the units and the scale of graphs/tables before answering.",
+      "Assumption questions: the correct assumption is something that MUST be true for the conclusion to hold.",
+      "Filipino verbal: watch for correct usage of 'ng' vs 'nang', and proper subject-verb agreement in Tagalog.",
+      "When stuck on a numerical item, plug in the choices (back-solving) if the options are numbers.",
+      "Time management: aim for ~1 minute per item on average in a 150-item exam (~2.5 hours).",
+      "After every practice set, review every wrong answer immediately — that is where real learning happens."
+    ];
+
+    const FUN_FACTS = [
+      "The Civil Service Exam has been administered in the Philippines for over a century as a merit-based system.",
+      "Professional level requires a bachelor's degree; Sub-Professional requires at least 72 units or high school + experience.",
+      "The 80% passing rate is absolute — there is no 'relative' ranking among examinees for eligibility.",
+      "General Information is only 5–10% of the exam but many fail because they neglect the Constitution and RA 6713.",
+      "Makati University is a common testing center in Metro Manila for CSC exams.",
+      "The best predictor of CSE success is consistent daily practice, not last-minute cramming.",
+      "Word analogy and logic items reward pattern recognition more than pure vocabulary size.",
+      "Environmental protection questions often come from the 1987 Constitution Article II Section 16 and related laws."
+    ];
+
+    // Question bank (starter set – patterns from your reviewers)
+    const QUESTIONS = [
+      // ===== NUMERICAL =====
+      {id:1, cat:"numerical", q:"What is 15% of 240?", opts:["24","36","48","30"], ans:1, exp:"15% = 0.15; 0.15 × 240 = 36."},
+      {id:2, cat:"numerical", q:"Find the next number: 2, 6, 12, 20, 30, ?", opts:["40","42","36","48"], ans:1, exp:"Differences increase by +2 each time: +4, +6, +8, +10, next +12 → 30+12=42."},
+      {id:3, cat:"numerical", q:"A car travels 180 km in 3 hours. What is its average speed?", opts:["50 kph","60 kph","70 kph","90 kph"], ans:1, exp:"Speed = Distance ÷ Time = 180 ÷ 3 = 60 kph."},
+      {id:4, cat:"numerical", q:"If 3x + 7 = 22, what is x?", opts:["3","5","7","15"], ans:1, exp:"3x = 22−7 = 15; x = 15÷3 = 5."},
+      {id:5, cat:"numerical", q:"The ratio of boys to girls is 3:5. If there are 40 students, how many are girls?", opts:["15","20","25","30"], ans:2, exp:"3+5=8 parts; 40÷8=5 per part; girls = 5×5 = 25."},
+      {id:6, cat:"numerical", q:"What is the simple interest on ₱5,000 at 6% per year for 2 years?", opts:["₱300","₱600","₱500","₱1,200"], ans:1, exp:"I = P×R×T = 5000×0.06×2 = ₱600."},
+      {id:7, cat:"numerical", q:"A number is increased by 20% and then decreased by 20%. The final result is:", opts:["Same as original","4% less","4% more","20% less"], ans:1, exp:"Let x=100. After +20% → 120. After −20% of 120 → 96. Net 4% less."},
+      {id:8, cat:"numerical", q:"Find the average of 12, 18, 24, 30, 36.", opts:["22","24","26","28"], ans:1, exp:"Sum = 120; 120÷5 = 24."},
+      {id:9, cat:"numerical", q:"If a shirt costs ₱800 after a 20% discount, what was the original price?", opts:["₱960","₱1,000","₱1,040","₱1,200"], ans:1, exp:"80% of original = 800 → original = 800 ÷ 0.8 = ₱1,000."},
+      {id:10, cat:"numerical", q:"What is the value of 2³ × 3²?", opts:["36","72","54","96"], ans:1, exp:"8 × 9 = 72."},
+      {id:11, cat:"numerical", q:"A train 120 m long passes a pole in 6 seconds. What is its speed in kph?", opts:["60","72","80","90"], ans:1, exp:"Speed = 120m / 6s = 20 m/s. 20×3.6 = 72 kph."},
+      {id:12, cat:"numerical", q:"Solve: 2(x−3) = 14", opts:["x=5","x=10","x=8","x=7"], ans:1, exp:"2x−6=14 → 2x=20 → x=10."},
+      {id:13, cat:"numerical", q:"The LCM of 12 and 18 is:", opts:["24","36","48","72"], ans:1, exp:"12=2²×3; 18=2×3²; LCM=2²×3²=36."},
+      {id:14, cat:"numerical", q:"If 5 workers finish a job in 12 days, how many days will 6 workers need (same rate)?", opts:["8","10","14","15"], ans:1, exp:"5×12=60 worker-days; 60÷6=10 days."},
+      {id:15, cat:"numerical", q:"What is ¾ of ⅔?", opts:["½","⅓","⅜","⅚"], ans:0, exp:"(3/4)×(2/3)=6/12=1/2."},
+
+      // ===== VERBAL (English) =====
+      {id:20, cat:"verbal", q:"Choose the correct sentence:", opts:["The team are playing well.","The team is playing well.","The team were playing well.","The teams is playing well."], ans:1, exp:"Collective noun 'team' is treated as singular in formal English → 'is'."},
+      {id:21, cat:"verbal", q:"Synonym of 'benevolent':", opts:["Hostile","Kind","Angry","Stingy"], ans:1, exp:"Benevolent means well-meaning and kindly."},
+      {id:22, cat:"verbal", q:"Antonym of 'scarce':", opts:["Rare","Abundant","Limited","Sparse"], ans:1, exp:"Scarce means insufficient; opposite is abundant."},
+      {id:23, cat:"verbal", q:"Which is correct?", opts:["She don't know the answer.","She doesn't know the answer.","She doesn't knows the answer.","She not know the answer."], ans:1, exp:"Third-person singular present requires 'doesn't' + base verb."},
+      {id:24, cat:"verbal", q:"'The quick brown fox jumps over the lazy dog' is an example of a:", opts:["Metaphor","Pangram","Hyperbole","Simile"], ans:1, exp:"A pangram contains every letter of the alphabet."},
+      {id:25, cat:"verbal", q:"Choose the properly punctuated sentence:", opts:["Its raining outside.","It's raining outside.","Its' raining outside.","It raining outside."], ans:1, exp:"It's = it is. Its is possessive."},
+      {id:26, cat:"verbal", q:"The word 'ephemeral' most nearly means:", opts:["Lasting","Temporary","Heavy","Ancient"], ans:1, exp:"Ephemeral means lasting for a very short time."},
+      {id:27, cat:"verbal", q:"Identify the error: 'Neither of the boys are ready.'", opts:["Neither","of the boys","are","ready"], ans:2, exp:"'Neither' is singular → verb should be 'is'."},
+      {id:28, cat:"verbal", q:"Choose the best word: The manager _____ the new policy yesterday.", opts:["announce","announces","announced","announcing"], ans:2, exp:"Past tense needed for 'yesterday'."},
+      {id:29, cat:"verbal", q:"'He is as tall as his brother' is a comparison of:", opts:["Equality","Inequality","Superiority","Inferiority"], ans:0, exp:"'As … as' expresses equality."},
+      {id:30, cat:"verbal", q:"Which sentence is in the passive voice?", opts:["The committee approved the plan.","The plan was approved by the committee.","The committee is approving the plan.","The committee will approve the plan."], ans:1, exp:"Passive: object becomes subject + be + past participle."},
+      {id:31, cat:"verbal", q:"Prefix 'un-' means:", opts:["Again","Not","Before","Together"], ans:1, exp:"Un- is a negative prefix (unhappy, unclear)."},
+      {id:32, cat:"verbal", q:"Choose the correct spelling:", opts:["Accomodate","Acommodate","Accommodate","Acomodate"], ans:2, exp:"Accommodate has double c and double m."},
+      {id:33, cat:"verbal", q:"The main idea of a paragraph is usually found in the:", opts:["Title only","Topic sentence","Last word","Supporting details"], ans:1, exp:"Topic sentence typically states the main idea."},
+      {id:34, cat:"verbal", q:"'Despite' is closest in meaning to:", opts:["Because of","In spite of","Due to","According to"], ans:1, exp:"Despite = in spite of."},
+
+      // ===== ANALYTICAL =====
+      {id:40, cat:"analytical", q:"Book is to Reading as Fork is to:", opts:["Drawing","Writing","Eating","Cooking"], ans:2, exp:"A book is used for reading; a fork is used for eating."},
+      {id:41, cat:"analytical", q:"If all roses are flowers and some flowers fade quickly, which is true?", opts:["All roses fade quickly","Some roses may fade quickly","No roses fade","All flowers are roses"], ans:1, exp:"We cannot conclude about all roses, only that some roses (being flowers) may fade."},
+      {id:42, cat:"analytical", q:"Complete the analogy: Physician : Hospital :: Teacher :", opts:["Student","School","Book","Lesson"], ans:1, exp:"A physician works in a hospital; a teacher works in a school."},
+      {id:43, cat:"analytical", q:"Which does not belong? 3, 5, 7, 9, 11", opts:["3","5","9","11"], ans:2, exp:"All others are prime; 9 is composite (3×3)."},
+      {id:44, cat:"analytical", q:"Statement: 'Only graduates can apply.' Assumption:", opts:["All graduates will apply","Non-graduates cannot apply","Graduates are preferred","The job is easy"], ans:1, exp:"The statement implies that non-graduates are not eligible."},
+      {id:45, cat:"analytical", q:"If A > B and B > C, then:", opts:["A < C","A = C","A > C","Cannot be determined"], ans:2, exp:"Transitive property of inequality."},
+      {id:46, cat:"analytical", q:"Find the odd one out: Circle, Triangle, Square, Rectangle, Sphere", opts:["Circle","Triangle","Sphere","Square"], ans:2, exp:"Sphere is 3-dimensional; others are 2-dimensional shapes."},
+      {id:47, cat:"analytical", q:"In a certain code, CAT = 24 and DOG = 26. What is BAT?", opts:["23","24","25","26"], ans:0, exp:"Sum of positions: C=3,A=1,T=20 → 24; D=4,O=15,G=7 → 26; B=2,A=1,T=20 → 23."},
+      {id:48, cat:"analytical", q:"Conclusion: 'Some politicians are honest.' Which statement supports it?", opts:["All politicians are honest","No politician is honest","Some honest people are politicians","All honest people are politicians"], ans:2, exp:"'Some honest people are politicians' is equivalent to 'some politicians are honest'."},
+      {id:49, cat:"analytical", q:"Series: 5, 10, 20, 40, ?", opts:["60","70","80","100"], ans:2, exp:"Each term is multiplied by 2."},
+      {id:50, cat:"analytical", q:"If Monday is the 1st, what day is the 25th?", opts:["Tuesday","Wednesday","Thursday","Friday"], ans:2, exp:"25−1=24 days later = exactly 3 weeks + 3 days → Thursday."},
+      {id:51, cat:"analytical", q:"Which is the most logical order? (1) Seed (2) Tree (3) Fruit (4) Flower", opts:["1-2-4-3","1-4-3-2","1-4-2-3","2-1-4-3"], ans:1, exp:"Seed → Flower → Fruit → Tree (or Seed → Tree → Flower → Fruit; closest standard is seed-flower-fruit-tree growth cycle, but common is 1-4-3-2)."},
+      {id:52, cat:"analytical", q:"All athletes are strong. Some strong people are teachers. Therefore:", opts:["All teachers are athletes","Some athletes are teachers","Some teachers may be strong","No teacher is an athlete"], ans:2, exp:"We can only conclude that some teachers may be strong (from the second premise)."},
+      {id:53, cat:"analytical", q:"Finger is to Hand as Leaf is to:", opts:["Tree","Branch","Forest","Root"], ans:1, exp:"Finger is part of hand; leaf is part of branch (or tree, but branch is more precise parallel)."},
+      {id:54, cat:"analytical", q:"If the day before yesterday was Thursday, what day will it be the day after tomorrow?", opts:["Sunday","Monday","Tuesday","Wednesday"], ans:1, exp:"Day before yesterday = Thu → Yesterday = Fri → Today = Sat → Tomorrow = Sun → Day after tomorrow = Mon."},
+
+      // ===== GENERAL INFORMATION =====
+      {id:60, cat:"geninfo", q:"The 1987 Philippine Constitution declares that sovereignty resides in the:", opts:["President","Congress","People","Supreme Court"], ans:2, exp:"Article II, Section 1: Sovereignty resides in the people and all government authority emanates from them."},
+      {id:61, cat:"geninfo", q:"RA 6713 is also known as the:", opts:["Anti-Graft Law","Code of Conduct and Ethical Standards for Public Officials and Employees","Civil Service Law","Local Government Code"], ans:1, exp:"RA 6713 is the Code of Conduct and Ethical Standards for Public Officials and Employees."},
+      {id:62, cat:"geninfo", q:"According to the Constitution, civilian authority is at all times supreme over the:", opts:["Judiciary","Military","Local governments","Congress"], ans:1, exp:"Article II, Section 3: Civilian authority is, at all times, supreme over the military."},
+      {id:63, cat:"geninfo", q:"The State shall protect and advance the right of the people to a balanced and healthful ecology. This is found in:", opts:["Art. II Sec. 16","Art. III Sec. 1","Art. XII Sec. 1","Art. XIV Sec. 1"], ans:0, exp:"Article II, Section 16 of the 1987 Constitution."},
+      {id:64, cat:"geninfo", q:"The national territory of the Philippines includes:", opts:["Only the islands","The archipelago and all territories under Philippine sovereignty including the territorial sea","Only Luzon, Visayas, Mindanao","Only land areas"], ans:1, exp:"Article I defines the national territory as the Philippine archipelago and all other territories over which the Philippines has sovereignty or jurisdiction."},
+      {id:65, cat:"geninfo", q:"The prime duty of the Government is to:", opts:["Collect taxes","Serve and protect the people","Wage war","Control the economy"], ans:1, exp:"Article II, Section 4: The prime duty of the Government is to serve and protect the people."},
+      {id:66, cat:"geninfo", q:"Which is a principle of RA 6713?", opts:["Public officials may use confidential information for personal gain","Public interest must be upheld over personal interest","Gifts of any value may be accepted","Political dynasty is encouraged"], ans:1, exp:"RA 6713 emphasizes that public officials must always uphold the public interest over personal interest."},
+      {id:67, cat:"geninfo", q:"The Philippines renounces _____ as an instrument of national policy.", opts:["Diplomacy","War","Trade","Education"], ans:1, exp:"Article II, Section 2: The Philippines renounces war as an instrument of national policy."},
+      {id:68, cat:"geninfo", q:"The Bill of Rights is found in which article of the 1987 Constitution?", opts:["Article I","Article II","Article III","Article IV"], ans:2, exp:"Article III is the Bill of Rights."},
+      {id:69, cat:"geninfo", q:"No person shall be deprived of life, liberty, or property without:", opts:["Presidential approval","Due process of law","Congressional hearing","Military clearance"], ans:1, exp:"Article III, Section 1: No person shall be deprived of life, liberty, or property without due process of law."},
+      {id:70, cat:"geninfo", q:"The State shall give priority to education, science and technology, arts, culture, and sports. This is:", opts:["Art. II Sec. 17","Art. XIV only","Art. XII","Not in the Constitution"], ans:0, exp:"Article II, Section 17."},
+      {id:71, cat:"geninfo", q:"Who has the power to declare the existence of a state of war?", opts:["The President alone","Congress by a vote of two-thirds of both Houses","The Supreme Court","The AFP Chief of Staff"], ans:1, exp:"Article VI, Section 23: Congress, by a vote of two-thirds of both Houses in joint session, has the sole power to declare the existence of a state of war."},
+      {id:72, cat:"geninfo", q:"The right of the people to information on matters of public concern is recognized in:", opts:["Art. II Sec. 28","Art. III Sec. 7","Both A and B","Neither"], ans:2, exp:"Both Article II Sec. 28 (policy of full public disclosure) and Article III Sec. 7 (right to information)."},
+      {id:73, cat:"geninfo", q:"Environmental protection is a constitutional duty of the State primarily under:", opts:["Art. II Sec. 16","Art. XII","Art. XIII","Preamble only"], ans:0, exp:"Article II, Section 16 explicitly protects the right to a balanced and healthful ecology."},
+      {id:74, cat:"geninfo", q:"Public officials and employees must remain true to the people at all times. This is a norm under:", opts:["RA 6713","RA 3019","RA 9184","1987 Constitution only"], ans:0, exp:"RA 6713 enumerates the norms of conduct including commitment to public interest and justness & sincerity."}
+    ];
+
+    // ========== STATE ==========
+    let state = {
+      answered: 0,
+      correct: 0,
+      streak: 0,
+      lastDate: null,
+      topicStats: { numerical: {c:0,t:0}, verbal: {c:0,t:0}, analytical: {c:0,t:0}, geninfo: {c:0,t:0} },
+      history: [],
+      today: { answered:0, correct:0, date: null }
+    };
+
+    let quiz = {
+      questions: [],
+      current: 0,
+      answers: [],
+      startTime: null,
+      timerInterval: null
+    };
+
+    // ========== INIT ==========
+    function init() {
+      loadState();
+      updateCountdown();
+      setInterval(updateCountdown, 60000);
+      showRandomTip();
+      updateHomeStats();
+      renderTips();
+      checkOnline();
+      setInterval(checkOnline, 5000);
+      // Hide loading after tip
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+      }, 2200);
+      // Service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(()=>{});
+      }
+    }
+
+    function loadState() {
+      try {
+        const s = localStorage.getItem('cseProState');
+        if (s) state = JSON.parse(s);
+        // Reset today if new day
+        const today = new Date().toDateString();
+        if (state.today.date !== today) {
+          state.today = { answered:0, correct:0, date: today };
+        }
+      } catch(e) {}
+    }
+
+    function saveState() {
+      localStorage.setItem('cseProState', JSON.stringify(state));
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = TARGET - now;
+      if (diff <= 0) {
+        document.getElementById('daysLeft').textContent = '0';
+        document.getElementById('timeDetail').textContent = 'Exam day! Good luck!';
+        return;
+      }
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      document.getElementById('daysLeft').textContent = days;
+      document.getElementById('timeDetail').textContent = `${hours}h ${mins}m remaining • Sunday, 22 Nov 2026`;
+    }
+
+    function showRandomTip() {
+      const tip = TIPS[Math.floor(Math.random()*TIPS.length)];
+      document.getElementById('loadingTip').textContent = tip;
+      document.getElementById('dailyTip').textContent = tip;
+    }
+
+    function checkOnline() {
+      const badge = document.getElementById('offlineBadge');
+      if (navigator.onLine) {
+        badge.textContent = 'ONLINE';
+        badge.classList.add('online');
+      } else {
+        badge.textContent = 'OFFLINE READY';
+        badge.classList.remove('online');
+      }
+    }
+
+    function showToast(msg, ms=2500) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), ms);
+    }
+
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById('screen-'+name).classList.add('active');
+      document.querySelectorAll('nav button').forEach(b=>{
+        b.classList.toggle('active', b.dataset.screen===name);
+      });
+      if (name==='progress') renderProgress();
+      if (name==='home') updateHomeStats();
+    }
+
+    function updateHomeStats() {
+      document.getElementById('statAnswered').textContent = state.answered;
+      const acc = state.answered ? Math.round(state.correct/state.answered*100) : 0;
+      document.getElementById('statAccuracy').textContent = acc + '%';
+      document.getElementById('statStreak').textContent = state.streak;
+      // weakest
+      let weakest = '—', min = 1;
+      for (const [k,v] of Object.entries(state.topicStats)) {
+        if (v.t > 0) {
+          const r = v.c / v.t;
+          if (r < min) { min = r; weakest = k; }
+        }
+      }
+      document.getElementById('statWeak').textContent = weakest === '—' ? '—' : weakest.charAt(0).toUpperCase()+weakest.slice(1);
+    }
+
+    // ========== QUIZ LOGIC ==========
+    function shuffle(arr) {
+      for (let i=arr.length-1;i>0;i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+
+    function pickQuestions(countPerCat) {
+      const cats = ['numerical','verbal','analytical','geninfo'];
+      let selected = [];
+      cats.forEach(cat => {
+        const pool = QUESTIONS.filter(q=>q.cat===cat);
+        const shuffled = shuffle([...pool]);
+        selected = selected.concat(shuffled.slice(0, countPerCat));
+      });
+      return shuffle(selected);
+    }
+
+    function startDiagnostic() {
+      quiz.questions = pickQuestions(10);
+      if (quiz.questions.length < 40) {
+        // repeat if bank is small
+        while (quiz.questions.length < 40) {
+          quiz.questions = quiz.questions.concat(pickQuestions(1));
+        }
+        quiz.questions = quiz.questions.slice(0,40);
+      }
+      beginQuiz();
+    }
+
+    function startPractice(total) {
+      const per = total / 4;
+      quiz.questions = pickQuestions(per);
+      while (quiz.questions.length < total) {
+        quiz.questions.push(...pickQuestions(1));
+      }
+      quiz.questions = shuffle(quiz.questions).slice(0, total);
+      beginQuiz();
+    }
+
+    function startCustom() {
+      const n = prompt('How many questions? (10–170)', '50');
+      if (!n) return;
+      const num = Math.min(170, Math.max(10, parseInt(n)||50));
+      const per = Math.ceil(num/4);
+      quiz.questions = pickQuestions(per);
+      while (quiz.questions.length < num) quiz.questions.push(...pickQuestions(1));
+      quiz.questions = shuffle(quiz.questions).slice(0, num);
+      beginQuiz();
+    }
+
+    function startWeakFocus() {
+      // Weight towards weakest topics
+      let scores = {};
+      for (const [k,v] of Object.entries(state.topicStats)) {
+        scores[k] = v.t === 0 ? 0.5 : v.c/v.t;
+      }
+      const sorted = Object.entries(scores).sort((a,b)=>a[1]-b[1]);
+      const weak = sorted.slice(0,2).map(x=>x[0]);
+      let selected = [];
+      weak.forEach(cat => {
+        const pool = QUESTIONS.filter(q=>q.cat===cat);
+        selected = selected.concat(shuffle([...pool]).slice(0,15));
+      });
+      // fill rest
+      const others = QUESTIONS.filter(q=>!weak.includes(q.cat));
+      selected = selected.concat(shuffle(others).slice(0,10));
+      quiz.questions = shuffle(selected).slice(0,40);
+      showToast('Focusing on: ' + weak.join(' & '));
+      beginQuiz();
+    }
+
+    function beginQuiz() {
+      quiz.current = 0;
+      quiz.answers = [];
+      quiz.startTime = Date.now();
+      showScreen('quiz');
+      renderQuestion();
+      if (quiz.timerInterval) clearInterval(quiz.timerInterval);
+      quiz.timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      const sec = Math.floor((Date.now()-quiz.startTime)/1000);
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(sec%60).padStart(2,'0');
+      document.getElementById('quizTimer').textContent = m+':'+s;
+    }
+
+    function renderQuestion() {
+      const q = quiz.questions[quiz.current];
+      const total = quiz.questions.length;
+      document.getElementById('quizProgress').textContent = `Q ${quiz.current+1} / ${total}`;
+      document.getElementById('quizBar').style.width = ((quiz.current)/total*100)+'%';
+
+      const catLabel = {numerical:'Numerical', verbal:'Verbal', analytical:'Analytical', geninfo:'General Info'}[q.cat];
+      let html = `<div class="question-card">
+        <div class="category-tag">${catLabel}</div>
+        <div class="q-num">Question ${quiz.current+1}</div>
+        <div class="q-text">${q.q}</div>`;
+      q.opts.forEach((o,i)=>{
+        html += `<button class="option" onclick="selectOption(${i})" id="opt${i}">${String.fromCharCode(65+i)}. ${o}</button>`;
+      });
+      html += `<div class="explanation" id="expl"></div></div>`;
+      document.getElementById('quizContent').innerHTML = html;
+
+      // actions
+      document.getElementById('quizActions').innerHTML = `
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Check Answer</button>
+        <button class="btn btn-outline btn-sm" onclick="skipQuestion()">Skip</button>
+      `;
+    }
+
+    let selectedOpt = null;
+    function selectOption(i) {
+      if (document.getElementById('expl').classList.contains('show')) return;
+      selectedOpt = i;
+      document.querySelectorAll('.option').forEach((el,idx)=>{
+        el.classList.toggle('selected', idx===i);
+      });
+      document.getElementById('nextBtn').disabled = false;
+      document.getElementById('nextBtn').textContent = 'Check Answer';
+      document.getElementById('nextBtn').onclick = checkAnswer;
+    }
+
+    function checkAnswer() {
+      const q = quiz.questions[quiz.current];
+      const correct = selectedOpt === q.ans;
+      quiz.answers.push({q, selected: selectedOpt, correct});
+
+      // mark options
+      document.querySelectorAll('.option').forEach((el,idx)=>{
+        el.classList.remove('selected');
+        if (idx === q.ans) el.classList.add('correct');
+        else if (idx === selectedOpt) el.classList.add('wrong');
+      });
+
+      // show explanation
+      const expl = document.getElementById('expl');
+      expl.innerHTML = `<strong>${correct ? '✓ Correct!' : '✗ Incorrect.'}</strong><br>${q.exp}`;
+      expl.classList.add('show');
+
+      // fun fact occasionally
+      if (Math.random() < 0.25) {
+        const fact = FUN_FACTS[Math.floor(Math.random()*FUN_FACTS.length)];
+        expl.innerHTML += `<div class="fun-fact" style="margin-top:10px;">💡 Fun Fact: ${fact}</div>`;
+      }
+
+      // update stats
+      state.answered++;
+      state.today.answered++;
+      if (correct) {
+        state.correct++;
+        state.today.correct++;
+      }
+      const ts = state.topicStats[q.cat];
+      ts.t++;
+      if (correct) ts.c++;
+      saveState();
+
+      document.getElementById('nextBtn').textContent = quiz.current+1 < quiz.questions.length ? 'Next Question' : 'See Results';
+      document.getElementById('nextBtn').onclick = nextQuestion;
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    function skipQuestion() {
+      quiz.answers.push({q: quiz.questions[quiz.current], selected: null, correct: false});
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      selectedOpt = null;
+      quiz.current++;
+      if (quiz.current >= quiz.questions.length) {
+        finishQuiz();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function finishQuiz() {
+      clearInterval(quiz.timerInterval);
+      const total = quiz.answers.length;
+      const correct = quiz.answers.filter(a=>a.correct).length;
+      const pct = Math.round(correct/total*100);
+
+      // streak
+      const today = new Date().toDateString();
+      if (state.lastDate !== today) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate()-1);
+        if (state.lastDate === yesterday.toDateString()) state.streak++;
+        else state.streak = 1;
+        state.lastDate = today;
+      }
+
+      state.history.unshift({
+        date: new Date().toISOString(),
+        total, correct, pct,
+        cats: {}
+      });
+      // per cat
+      ['numerical','verbal','analytical','geninfo'].forEach(c=>{
+        const items = quiz.answers.filter(a=>a.q.cat===c);
+        state.history[0].cats[c] = {
+          t: items.length,
+          c: items.filter(a=>a.correct).length
+        };
+      });
+      if (state.history.length > 20) state.history.pop();
+      saveState();
+
+      // render result
+      document.getElementById('resultScore').textContent = pct + '%';
+      document.getElementById('resultScore').className = 'result-big ' + (pct>=PASSING?'pass':'fail');
+      document.getElementById('resultBadge').innerHTML = pct>=PASSING
+        ? '<span class="badge badge-pass">PASSED (≥80%)</span>'
+        : '<span class="badge badge-fail">NEEDS IMPROVEMENT (<80%)</span>';
+      document.getElementById('resultSummary').textContent = `You got ${correct} out of ${total} correct.`;
+      document.getElementById('resultBar').style.width = pct+'%';
+      document.getElementById('resultBar').style.background = pct>=PASSING ? 'var(--accent2)' : 'var(--danger)';
+
+      let catHtml = '';
+      for (const [k,v] of Object.entries(state.history[0].cats)) {
+        if (v.t===0) continue;
+        const p = Math.round(v.c/v.t*100);
+        catHtml += `<div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.9rem;">
+            <span>${k.charAt(0).toUpperCase()+k.slice(1)}</span>
+            <span>${v.c}/${v.t} (${p}%)</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:${p>=80?'var(--accent2)':'var(--accent3)'}"></div></div>
+        </div>`;
+      }
+      document.getElementById('resultCats').innerHTML = catHtml;
+
+      // tip based on weak
+      let weakTip = '';
+      let minP = 100, weakCat = '';
+      for (const [k,v] of Object.entries(state.history[0].cats)) {
+        if (v.t>0) {
+          const p = v.c/v.t*100;
+          if (p < minP) { minP=p; weakCat=k; }
+        }
+      }
+      if (weakCat) {
+        const tipsMap = {
+          numerical: "Review basic operations, ratios, and number series. Practice back-solving with the choices.",
+          verbal: "Focus on subject-verb agreement, common synonyms/antonyms, and reading the questions first in comprehension.",
+          analytical: "Practice identifying exact relationships in analogies and necessary assumptions in logic items.",
+          geninfo: "Re-read Article II of the 1987 Constitution and the key provisions of RA 6713 daily."
+        };
+        weakTip = `<div class="tip-card"><strong>Focus next:</strong> ${weakCat}<br>${tipsMap[weakCat]}</div>`;
+      }
+      document.getElementById('resultTips').innerHTML = weakTip;
+
+      showScreen('result');
+      showToast(pct>=PASSING ? 'Great job! Keep it up!' : 'Review the explanations and try again.');
+    }
+
+    function reviewAnswers() {
+      let html = '';
+      quiz.answers.forEach((a,i)=>{
+        const q = a.q;
+        html += `<div class="card">
+          <div class="category-tag">${q.cat}</div>
+          <div class="q-text">${i+1}. ${q.q}</div>
+          <p style="font-size:0.9rem;">Your answer: ${a.selected!==null ? q.opts[a.selected] : 'Skipped'}
+          ${a.correct?'✓':'✗'}</p>
+          <p style="font-size:0.9rem; color:var(--accent2);">Correct: ${q.opts[q.ans]}</p>
+          <p style="font-size:0.85rem; color:var(--muted);">${q.exp}</p>
+        </div>`;
+      });
+      document.getElementById('quizContent').innerHTML = html;
+      document.getElementById('quizActions').innerHTML = `<button class="btn btn-primary" onclick="showScreen('home')">Done</button>`;
+      document.getElementById('quizProgress').textContent = 'Review';
+      document.getElementById('quizBar').style.width = '100%';
+      showScreen('quiz');
+    }
+
+    // ========== PROGRESS ==========
+    function renderProgress() {
+      const t = state.today;
+      const tAcc = t.answered ? Math.round(t.correct/t.answered*100) : 0;
+      document.getElementById('todayStats').innerHTML = t.answered
+        ? `<p>Answered: <strong>${t.answered}</strong> • Correct: <strong>${t.correct}</strong> • Accuracy: <strong>${tAcc}%</strong>
+           ${tAcc>=80?'<span class="badge badge-pass">On track</span>':'<span class="badge badge-fail">Below 80%</span>'}</p>`
+        : 'No activity yet today. Start a diagnostic!';
+
+      // week
+      const week = state.history.filter(h=>{
+        const d = new Date(h.date);
+        return (Date.now()-d.getTime()) < 7*86400000;
+      });
+      if (week.length) {
+        const wAns = week.reduce((s,h)=>s+h.total,0);
+        const wCor = week.reduce((s,h)=>s+h.correct,0);
+        const wAcc = Math.round(wCor/wAns*100);
+        document.getElementById('weekStats').innerHTML = `
+          <p>Sessions: ${week.length} • Items: ${wAns} • Accuracy: <strong>${wAcc}%</strong></p>
+          <div class="progress-bar"><div class="progress-fill" style="width:${wAcc}%"></div></div>`;
+      } else {
+        document.getElementById('weekStats').textContent = 'No sessions this week yet.';
+      }
+
+      // topic bars
+      let bars = '';
+      for (const [k,v] of Object.entries(state.topicStats)) {
+        const p = v.t ? Math.round(v.c/v.t*100) : 0;
+        bars += `<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+            <span>${k}</span><span>${p}% (${v.c}/${v.t})</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:${p>=80?'var(--accent2)':p>=50?'var(--accent3)':'var(--danger)'}"></div></div>
+        </div>`;
+      }
+      document.getElementById('topicBars').innerHTML = bars || 'Answer some questions first.';
+
+      // history
+      let hist = '';
+      state.history.slice(0,7).forEach(h=>{
+        const d = new Date(h.date).toLocaleDateString();
+        hist += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.9rem;">
+          <span>${d}</span>
+          <span>${h.correct}/${h.total} <strong style="color:${h.pct>=80?'var(--accent2)':'var(--danger)'}">${h.pct}%</strong></span>
+        </div>`;
+      });
+      document.getElementById('historyList').innerHTML = hist || 'No history yet.';
+    }
+
+    function renderTips() {
+      let html = '';
+      TIPS.forEach((t,i)=>{
+        html += `<div class="tip-card">${i+1}. ${t}</div>`;
+      });
+      html += `<div class="card" style="margin-top:16px;"><h2>Speed & Clue Tips</h2>
+        <div class="tip-card">Eliminate two wrong options first — probability doubles.</div>
+        <div class="tip-card">For number series, write the differences or ratios between consecutive terms.</div>
+        <div class="tip-card">In reading items, read the question stem before the long passage.</div>
+        <div class="tip-card">Watch for absolute words (always, never, only) — they are often wrong in assumption questions.</div>
+        <div class="tip-card">Budget ~1 minute per item. Flag hard ones and return later.</div>
+      </div>`;
+      document.getElementById('tipsList').innerHTML = html;
+    }
+
+    function clearProgress() {
+      if (confirm('Reset all progress, stats, and history? This cannot be undone.')) {
+        state = { answered:0, correct:0, streak:0, lastDate:null,
+          topicStats:{numerical:{c:0,t:0},verbal:{c:0,t:0},analytical:{c:0,t:0},geninfo:{c:0,t:0}},
+          history:[], today:{answered:0,correct:0,date:new Date().toDateString()} };
+        saveState();
+        updateHomeStats();
+        showToast('Progress cleared');
+      }
+    }
+
+    // start
+    init();
   </script>
 </body>
-<html>
+</html>
